@@ -96,7 +96,7 @@ import { format } from 'date-fns';
 const Posts = ({ filter }) => {
   // Filter data based on the selected filter
   const filteredPosts = filter === 'all' 
-    ? [...posts, ...incidents] 
+    ? [...posts] 
     : filter === 'posts'
     ? posts
     : filter === 'incidents'
@@ -110,7 +110,7 @@ const Posts = ({ filter }) => {
       {filteredPosts.map((post) => (
         <div
           key={post.id}
-          className="bg-white p-6 rounded-lg shadow-md space-y-4 max-w-[580px] max-h-[740px] mx-auto overflow-hidden"
+          className="bg-white p-6 rounded-lg shadow-lg max-w-3xl mx-auto overflow-hidden"
         >
           {/* Post Header: User Name & Date */}
           <div className="flex items-center space-x-4">
