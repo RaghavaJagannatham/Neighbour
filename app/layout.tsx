@@ -1,11 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Sidebar from "@/components/Dashboard/Sidebar"; // Import Sidebar component
- // Import Dashboard if needed (or other components like CenterContent)
-import { useRouter } from "next/navigation"; // For routing
-import RightSidebar from "@/components/Dashboard/RightSideBar";
-import Header from "@/components/Header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,22 +24,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Header />
-        <div className="flex min-h-screen bg-gray-100">
-          {/* Sidebar */}
-          <Sidebar />
-          
-          {/* Main Content */}
-          <main className="flex-1 p-4">
-            <div className="max-w-7xl mx-auto">{children}</div>
-          </main>
-
-          {/* Right Sidebar */}
-          <aside className="hidden lg:block lg:w-1/4 p-4 space-y-6">
-            <RightSidebar />
-          </aside>
-        </div>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        {children}
       </body>
     </html>
   );

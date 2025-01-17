@@ -3,35 +3,46 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-const SignupPage = () => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const CreatePostPage = () => {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [image, setImage] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const token = localStorage.getItem('token'); // Get token from localStorage
+
+    if (!token) {
+      setError('You must be logged in to create a post');
+      return;
+    }
+
     try {
-      const response = await fetch('/api/auth/signup', {
+      const response = await fetch('/api/posts/new', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Send token in Authorization header
         },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({
+          title,
+          description,
+          image,
+        }),
       });
 
       if (!response.ok) {
         const { error } = await response.json();
-        setError(error);
+        setError(error || 'Error creating post');
         return;
       }
 
-      // Redirect to login page after successful signup
-      router.push('/auth/login');
+      router.push('/home'); // Redirect after successful post creation
     } catch (err) {
-      console.error('Signup error:', err);
+      console.error('Error creating post:', err);
       setError('Something went wrong. Please try again.');
     }
   };
@@ -39,46 +50,44 @@ const SignupPage = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
       <div className="w-full max-w-md bg-white shadow-md rounded-lg p-8">
-        <h1 className="text-2xl font-bold text-center mb-6">Sign Up</h1>
-        <form onSubmit={handleSignup}>
+        <h1 className="text-2xl font-bold text-center mb-6">Create a New Post</h1>
+        <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-              Username
+            <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+              Title
             </label>
             <input
               type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-500 focus:outline-none"
             />
           </div>
 
           <div className="mb-4">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+              Description
             </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+            <textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-500 focus:outline-none"
             />
           </div>
 
           <div className="mb-4">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Password
+            <label htmlFor="image" className="block text-sm font-medium text-gray-700">
+              Image URL
             </label>
             <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
+              type="text"
+              id="image"
+              value={image}
+              onChange={(e) => setImage(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-500 focus:outline-none"
             />
           </div>
@@ -89,19 +98,12 @@ const SignupPage = () => {
             type="submit"
             className="w-full py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:ring focus:ring-blue-300 focus:outline-none"
           >
-            Sign Up
+            Create Post
           </button>
         </form>
-
-        <p className="text-sm text-gray-600 text-center mt-4">
-          Already have an account?{' '}
-          <a href="/auth/login" className="text-blue-500 hover:underline">
-            Login
-          </a>
-        </p>
       </div>
     </div>
   );
 };
 
-export default SignupPage;
+export default CreatePostPage;

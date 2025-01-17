@@ -1,108 +1,108 @@
 'use client';
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Input from "@/components/Input";
-import Button from "../../../components/Button";
-import FormContainer from "@/components/FormContainer";
-import Link from "next/link";
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  const [isClient, setIsClient] = useState(false); // State to track if it's client-side
+const LoginPage = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [userData, setUserData] = useState(null);
+  const router = useRouter();
 
-  const router = useRouter(); // Initialize router for redirection
-
-  useEffect(() => {
-    setIsClient(true); // Set to true when the component is mounted on the client side
-  }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const response = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await response.json();
-
-    if (response.ok) {
-      // If login is successful, handle the success (e.g., store token, redirect)
-      setSuccessMessage(data.message);
-      setError(""); // Clear any previous errors
-
-      // Store the JWT token in localStorage
-      localStorage.setItem("token", data.token);
-
-      // Only redirect if it's a client-side render
-      if (isClient) {
-        router.push("/auth/home"); // Redirect to the home page
+      if (!response.ok) {
+        const { error } = await response.json();
+        setError(error);
+        return;
       }
-    } else {
-      // If there's an error, set the error message
-      setError(data.error);
-      setSuccessMessage(""); // Clear any previous success messages
+
+      const { token, user } = await response.json();
+      setUserData({ token, user }); // Set user data to state
+      router.push('/home'); // Redirect after login
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('Something went wrong. Please try again.');
     }
   };
 
-  if (!isClient) {
-    return null;  // Return null or a loading spinner until the component is mounted on the client
-  }
+  // UseEffect to update localStorage when userData changes
+  useEffect(() => {
+    if (userData) {
+      const { token, user } = userData;
+
+      // Update localStorage with new user data
+      localStorage.setItem('token', token);
+      localStorage.setItem('userId', user.id);
+      localStorage.setItem('username', user.username);
+
+      console.log('User data updated in localStorage:', user);
+    }
+  }, [userData]);
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-green-100 to-blue-50">
-      <FormContainer title="" className="bg-white p-10 rounded-lg shadow-2xl max-w-lg w-full">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800">Welcome Back</h1>
-          <p className="text-lg text-gray-500">Please enter your credentials to continue</p>
-        </div>
-
-        <form onSubmit={handleSubmit}>
-          <Input
-            label="Email"
-            name="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
-            required
-            className="mb-5 p-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 text-lg"
-          />
-          <Input
-            label="Password"
-            name="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter your password"
-            required
-            className="mb-6 p-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 text-lg"
-          />
-          
-          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-          {successMessage && <p className="text-green-500 text-sm mb-4">{successMessage}</p>}
-
-          <Button text="Login" className="w-full bg-green-600 hover:bg-green-700 text-white p-4 rounded-lg text-lg font-semibold transition duration-200" />
-          
-          <div className="mt-6 text-center">
-            <p className="text-sm">
-              Don't have an account?{" "}
-              <Link href="/auth/signup" className="text-green-600 hover:underline">
-                Sign Up
-              </Link>
-            </p>
+    <div className="flex min-h-screen items-center justify-center bg-gray-100">
+      <div className="w-full max-w-md bg-white shadow-md rounded-lg p-8">
+        <h1 className="text-2xl font-bold text-center mb-6">Login</h1>
+        <form onSubmit={handleLogin}>
+          <div className="mb-4">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-500 focus:outline-none"
+            />
           </div>
+
+          <div className="mb-4">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-500 focus:outline-none"
+            />
+          </div>
+
+          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+
+          <button
+            type="submit"
+            className="w-full py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:ring focus:ring-blue-300 focus:outline-none"
+          >
+            Login
+          </button>
         </form>
-      </FormContainer>
+
+        <p className="text-sm text-gray-600 text-center mt-4">
+          Don’t have an account?{' '}
+          <a href="/auth/signup" className="text-blue-500 hover:underline">
+            Sign up
+          </a>
+        </p>
+      </div>
     </div>
   );
 };
 
-export default Login;
+export default LoginPage;
