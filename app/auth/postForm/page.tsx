@@ -11,47 +11,52 @@ const PostForm = ({ onPostSubmit }) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Create a preview URL for the selected image
       const previewUrl = URL.createObjectURL(file);
       setImage(file);
       setImagePreview(previewUrl);
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation
     if (!title || !content) {
       alert('Title and content are required!');
       return;
     }
 
-    const newPost = {
-      id: Date.now(),
+    const postData = {
       title,
       content,
-      likes: 0,
-      comments: 0,
-      image: imagePreview || '', // Use preview URL for now
-      date: new Date().toISOString(),
+      image: imagePreview || '', // Add the image URL or placeholder
     };
 
-    console.log('Submitting Post:', newPost);
+    try {
+      const res = await fetch('/api/auth/posts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postData),
+      });
 
-    // Call the parent function to handle the new post
-    onPostSubmit(newPost);
-
-    // Reset the form
-    setTitle('');
-    setContent('');
-    setImage(null);
-    setImagePreview(null);
+      const data = await res.json();
+      if (res.ok) {
+        onPostSubmit(data); // Call the parent function to handle the new post
+        setTitle('');
+        setContent('');
+        setImage(null);
+        setImagePreview(null);
+      } else {
+        alert(data.error || 'Failed to create post');
+      }
+    } catch (error) {
+      console.error('Error creating post:', error);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 shadow-lg rounded-lg">
-      {/* Title */}
       <div>
         <label className="block font-semibold mb-2">Title</label>
         <input
@@ -64,7 +69,6 @@ const PostForm = ({ onPostSubmit }) => {
         />
       </div>
 
-      {/* Content */}
       <div>
         <label className="block font-semibold mb-2">Content</label>
         <textarea
@@ -77,7 +81,6 @@ const PostForm = ({ onPostSubmit }) => {
         />
       </div>
 
-      {/* Image Upload */}
       <div>
         <label className="block font-semibold mb-2">Upload Image (Optional)</label>
         <input
@@ -98,7 +101,6 @@ const PostForm = ({ onPostSubmit }) => {
         )}
       </div>
 
-      {/* Submit Button */}
       <div>
         <button
           type="submit"
