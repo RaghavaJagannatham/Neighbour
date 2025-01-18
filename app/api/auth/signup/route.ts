@@ -4,7 +4,7 @@ import dbConnect from '@/app/utils/dbConnect';
 import User from '@/app/models/User';
 
 export async function POST(req: Request) {
-  const { username, email, password } = await req.json();
+  const { username, email, password, bio, profilePicture, contactInfo, location } = await req.json();
 
   // Check if the user already exists
   await dbConnect();
@@ -17,7 +17,16 @@ export async function POST(req: Request) {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   // Create and save the new user
-  const newUser = new User({ username, email, password: hashedPassword });
+  const newUser = new User({
+    username,
+    email,
+    password: hashedPassword,
+    bio,
+    profilePicture,
+    contactInfo,
+    location,
+  });
+
   await newUser.save();
 
   return NextResponse.json({ message: 'Signup successful' });

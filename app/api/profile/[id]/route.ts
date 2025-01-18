@@ -1,30 +1,29 @@
-// /app/api/profile/[id]/route.ts
+// app/api/profile/[id]/route.ts
 
-import { NextApiRequest, NextApiResponse } from 'next';
-import dbConnect from '@/app/utils/dbConnect';
-import User from '@/app/models/User';
+import { NextResponse } from 'next/server';
+import User from '@/app/models/User'; // Assuming User model is in models/User.ts
 
-export async function GET(req: NextApiRequest, res: NextApiResponse) {
-  const { id } = req.query;
-
-  if (!id) {
-    return res.status(400).json({ error: 'User ID is required' });
-  }
-
+export async function GET(req: Request, { params }: { params: { id: string } }) {
   try {
-    console.log('Connecting to the database...');
-    await dbConnect(); // Ensure DB is connected
+    const user = await User.findById(params.id).select('username email bio profilePicture contactInfo location');
 
-    const user = await User.findById(id).select('-password'); // Exclude password
     if (!user) {
-      console.error('User not found for ID:', id);
-      return res.status(404).json({ error: 'User not found' });
+      return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
-    console.log('User found:', user);
-    res.status(200).json(user); // Return user data
+    // Format user data as needed for frontend
+    const userData = {
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      bio: user.bio || 'No bio available',
+      profilePicture: user.profilePicture || '/default-profile.png',
+      contactInfo: user.contactInfo || 'Not provided',
+      location: user.location || 'Location not specified',
+    };
+
+    return NextResponse.json(userData);
   } catch (error) {
-    console.error('Error while fetching user data:', error);
-    res.status(500).json({ error: 'Failed to fetch user data' });
+    return NextResponse.json({ message: 'Error fetching user data' }, { status: 500 });
   }
 }

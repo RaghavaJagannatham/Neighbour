@@ -7,8 +7,24 @@ const SignupPage = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [bio, setBio] = useState('');
+  const [profilePicture, setProfilePicture] = useState<string | null>(null); // Store base64 image
+  const [contactInfo, setContactInfo] = useState('');
+  const [location, setLocation] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
+
+  // Handle profile picture file selection
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfilePicture(reader.result as string); // Store base64 image string
+      };
+      reader.readAsDataURL(file); // Read the file as base64 string
+    }
+  };
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -19,7 +35,15 @@ const SignupPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({
+          username,
+          email,
+          password,
+          bio,
+          profilePicture, // Send the base64 string
+          contactInfo,
+          location,
+        }),
       });
 
       if (!response.ok) {
@@ -79,6 +103,63 @@ const SignupPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-500 focus:outline-none"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="bio" className="block text-sm font-medium text-gray-700">
+              Bio (Optional)
+            </label>
+            <input
+              type="text"
+              id="bio"
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-500 focus:outline-none"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="profilePicture" className="block text-sm font-medium text-gray-700">
+              Profile Picture (Optional)
+            </label>
+            <input
+              type="file"
+              id="profilePicture"
+              onChange={handleImageChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-500 focus:outline-none"
+            />
+            {profilePicture && (
+              <div className="mt-4">
+                <img src={profilePicture} alt="Selected Profile Picture" className="max-w-xs rounded-md" />
+                <p className="mt-2 text-gray-600">Selected file: {profilePicture.split(',')[0]}</p> {/* Display image file type */}
+              </div>
+            )}
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="contactInfo" className="block text-sm font-medium text-gray-700">
+              Contact Info (Optional)
+            </label>
+            <input
+              type="text"
+              id="contactInfo"
+              value={contactInfo}
+              onChange={(e) => setContactInfo(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-500 focus:outline-none"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="location" className="block text-sm font-medium text-gray-700">
+              Location (Optional)
+            </label>
+            <input
+              type="text"
+              id="location"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-500 focus:outline-none"
             />
           </div>
