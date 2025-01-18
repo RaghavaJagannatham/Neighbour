@@ -8,7 +8,11 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ setFilter }) => {
-    const router = useRouter();
+  const router = useRouter();
+  
+  // Assuming you fetch or pass the logged-in user's ID somehow.
+  const userId = localStorage.getItem('userId') // Replace with the actual user ID from context, auth, etc.
+
   return (
     <aside className="w-64 h-screen bg-gray-100 shadow-md p-4">
       <h2 className="text-lg font-bold mb-4">Filters</h2>
@@ -53,10 +57,18 @@ const Sidebar: React.FC<SidebarProps> = ({ setFilter }) => {
         </li>
         <li>
           <button
-            onClick={() => alert('Navigate to Add New Incident')}
+            onClick={() => router.push('/incidents/new')}
             className="w-full text-left px-4 py-2 rounded-lg hover:bg-blue-100"
           >
             Add New Incident
+          </button>
+        </li>
+        <li>
+          <button
+            onClick={() => router.push(`/profile/${userId}`)}
+            className="w-full text-left px-4 py-2 rounded-lg hover:bg-blue-100"
+          >
+            View Profile
           </button>
         </li>
       </ul>

@@ -5,10 +5,10 @@ import { useRouter } from 'next/navigation';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import PostCard from '../components/PostCard';
+import IncidentCard from '../components/IncidentCard'; // This will handle incidents
 import useFetchPosts from '../hooks/usefetchPosts';
 
 const HomePage = () => {
-  const [posts, setPosts] = useState([]);
   const [filter, setFilter] = useState('for-you');
   const [page, setPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -16,7 +16,8 @@ const HomePage = () => {
   const router = useRouter();
   const { data, loading, error } = useFetchPosts(`/api/home?filter=${filter}&page=${page}`);
 
-  // Check if the user is logged in
+  const isIncidentFilter = filter === 'incidents'; // Check if the filter is set to incidents
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -24,28 +25,17 @@ const HomePage = () => {
     }
   }, [router]);
 
-  // Handle new data fetch
-  useEffect(() => {
-    if (data) {
-      // If page is 1, replace posts; otherwise, append
-      setPosts((prevPosts) => (page === 1 ? data.posts : [...prevPosts, ...data.posts]));
-    }
-  }, [data, page]);
-
-  // Handle filter change
-  useEffect(() => {
-    setPosts([]); // Clear posts when filter changes
-    setPage(1); // Reset to the first page
-  }, [filter]);
-
-  // Infinite scroll logic
-  const handleScroll = (e) => {
+  // Handle infinite scroll
+  const handleScroll = (e: React.UIEvent) => {
     const bottom = e.target.scrollHeight === e.target.scrollTop + e.target.clientHeight;
-    if (bottom && !loading && !loadingMore) {
+    if (bottom && !loadingMore) {
       setLoadingMore(true);
       setPage((prevPage) => prevPage + 1);
     }
   };
+
+  // Get the appropriate data (posts or incidents) based on the filter
+  const dataToDisplay = isIncidentFilter ? data?.incidents : data?.posts;
 
   return (
     <div className="flex min-h-screen" onScroll={handleScroll}>
@@ -59,11 +49,17 @@ const HomePage = () => {
             <p className="text-center text-red-500">Error: {error}</p>
           ) : (
             <div>
-              <h2 className="text-2xl font-bold mb-4">Posts</h2>
-              {posts.length > 0 ? (
-                posts.map((post) => <PostCard key={post._id} post={post} />)
+              <h2 className="text-2xl font-bold mb-4">{isIncidentFilter ? 'Incidents' : 'Posts'}</h2>
+              {dataToDisplay && dataToDisplay.length > 0 ? (
+                dataToDisplay.map((item: any) => (
+                  isIncidentFilter ? (
+                    <IncidentCard key={item._id} incident={item} />
+                  ) : (
+                    <PostCard key={item._id} post={item} />
+                  )
+                ))
               ) : (
-                <p className="text-center text-gray-500">No posts found.</p>
+                <p className="text-center text-gray-500">No {isIncidentFilter ? 'incidents' : 'posts'} found.</p>
               )}
             </div>
           )}
