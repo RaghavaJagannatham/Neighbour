@@ -20,6 +20,11 @@ export const sidebarLinks = [
     label: "Create Thread",
   },
   {
+    imgURL: "/assets/create.svg",
+    route: "/create-incident",
+    label: "Create Incident",
+  },
+  {
     imgURL: "/assets/community.svg",
     route: "/communities",
     label: "Communities",

@@ -6,6 +6,7 @@ import { connectToDB } from "../mongoose";
 
 import User from "../models/user.model";
 import Thread from "../models/thread.model";
+import Incident from "../models/incident.model";
 import Community from "../models/community.model";
 
 export async function fetchPosts(pageNumber = 1, pageSize = 20) {
@@ -86,6 +87,41 @@ export async function createThread({ text, author, communityId, path }: Params
     revalidatePath(path);
   } catch (error: any) {
     throw new Error(`Failed to create thread: ${error.message}`);
+  }
+}
+
+
+export async function createIncident({ text, author, communityId, path }: Params
+) {
+  try {
+    connectToDB();
+
+    const communityIdObject = await Community.findOne(
+      { id: communityId },
+      { _id: 1 }
+    );
+
+    const createdIncident = await Incident.create({
+      text,
+      author,
+      community: communityIdObject, // Assign communityId if provided, or leave it null for personal account
+    });
+
+    // Update User model
+    await User.findByIdAndUpdate(author, {
+      $push: { incidents: createdIncident._id },
+    });
+
+    if (communityIdObject) {
+      // Update Community model
+      await Community.findByIdAndUpdate(communityIdObject, {
+        $push: { incidents: createdIncident._id },
+      });
+    }
+
+    revalidatePath(path);
+  } catch (error: any) {
+    throw new Error(`Failed to create Incident: ${error.message}`);
   }
 }
 
