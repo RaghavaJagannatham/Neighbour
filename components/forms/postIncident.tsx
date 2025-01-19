@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
 import { IncidentValidation } from "@/lib/validations/thread";
-import { createIncident } from "@/lib/actions/thread.actions";
+import { createIncident } from "@/lib/actions/incident.actions";
 
 interface Props {
   userId: string;
