@@ -19,7 +19,7 @@ async function Home({
   const userInfo = await fetchUser(user.id);
   if (!userInfo?.onboarded) redirect("/onboarding");
 
-  const activeFilter = searchParams.filter || "Incidents";
+  const activeFilter = searchParams.filter || "Posts";
   const page = searchParams.page ? +searchParams.page : 1;
   const itemsPerPage = 30;
 
