@@ -1,0 +1,143 @@
+/app
+├── /auth
+│   ├── /onboarding
+│   │   └── page.tsx
+│   ├── /signin
+│   │   └── page.tsx
+│   ├── /signup
+│   │   └── page.tsx
+│   └── layout.tsx
+├── /root
+│   ├── /activity
+│   │   └── page.tsx
+│   ├── /communities
+│   │   └── (empty - to be populated)
+│   ├── /create-incident
+│   │   └── page.tsx
+│   ├── /create-thread
+│   │   └── page.tsx
+│   ├── /incident
+│   │   └── [id]
+│   │       └── page.tsx
+│   ├── /profile
+│   │   ├── [id]
+│   │   │   └── page.tsx
+│   │   └── /edit
+│   │       └── page.tsx
+│   ├── /search
+│   │   └── page.tsx
+│   ├── /thread
+│   │   └── [id]
+│   │       └── page.tsx
+│   ├── layout.tsx
+│   └── page.tsx
+├── /api
+│   └── /uploadthing
+│       ├── core.ts
+│       └── route.ts
+├── /components
+│   ├── /cards
+│   │   ├── CommunityCard.tsx
+│   │   ├── IncidentCard.tsx
+│   │   ├── ThreadCard.tsx
+│   │   └── UserCard.tsx
+│   ├── /community
+│   │   └── (empty - to be populated)
+│   ├── /forms
+│   │   ├── AccountProfile.tsx
+│   │   ├── Comment.tsx
+│   │   ├── CommentIncident.tsx
+│   │   ├── DeleteIncident.tsx
+│   │   ├── DeleteThread.tsx
+│   │   ├── PostIncident.tsx
+│   │   └── PostThread.tsx
+│   ├── /shared
+│   │   ├── Bottombar.tsx
+│   │   ├── LeftSidebar.tsx
+│   │   ├── Pagination.tsx
+│   │   ├── ProfileHeader.tsx
+│   │   ├── RightSidebar.tsx
+│   │   ├── Searchbar.tsx
+│   │   ├── ThreadsTab.tsx
+│   │   └── Topbar.tsx
+│   └── /ui
+│       ├── button.tsx
+│       ├── form.tsx
+│       ├── input.tsx
+│       ├── label.tsx
+│       ├── menubar.tsx
+│       ├── select.tsx
+│       ├── tabs.tsx
+│       ├── textarea.tsx
+│       ├── toast.tsx
+│       ├── toaster.tsx
+│       └── use-toast.ts
+├── /constants
+│   └── index.js
+├── /lib
+│   ├── /actions
+│   │   ├── community.actions.ts
+│   │   ├── incident.actions.ts
+│   │   ├── thread.actions.ts
+│   │   └── user.actions.ts
+│   ├── /models
+│   │   ├── community.model.ts
+│   │   ├── incident.model.ts
+│   │   ├── thread.model.ts
+│   │   └── user.model.ts
+│   ├── /validations
+│   │   ├── incident.ts
+│   │   ├── thread.ts
+│   │   └── user.ts
+│   ├── mongoose.ts
+│   ├── uploadthing.ts
+│   └── utils.ts
+├── /public
+│   └── (static assets like images, fonts, icons)
+├── /node_modules
+│   └── (dependencies managed by npm/yarn)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Detailed Description of Each Page
+Communities List Page (/app/root/communities/page.tsx):
+
+Displays all communities in a grid view using CommunityCard.
+Contains a "Create Community" button to navigate to the Create Community page.
+Community Details Page (/app/root/communities/[id]/page.tsx):
+
+Displays detailed information about a community, including its:
+Name, username, bio, image.
+Members count and associated threads/incidents.
+Includes a "Join Community" or "Leave Community" button based on user membership.
+Community Members Management Page (/app/root/communities/[id]/members/page.tsx):
+
+Lists all members in a community.
+Displays their profile pictures, usernames, and bios.
+Allows admins to manage members (add/remove).
+Threads/Incidents in a Community (/app/root/communities/[id]/threads/page.tsx):
+
+Lists all threads or incidents associated with a specific community.
+Uses the ThreadCard component for display.
+Create Community Page (/app/root/communities/create/page.tsx):
+
+Allows users to create a community by submitting:
+Name, username, bio, image.
+Validates inputs and redirects users after successful creation.
