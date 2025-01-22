@@ -28,6 +28,8 @@ async function page({ params }: { params: { id: string } }) {
           currentUserId={user.id}
           parentId={thread.parentId}
           content={thread.text}
+          title={thread.title}
+          image={thread.image}
           author={thread.author}
           community={thread.community}
           createdAt={thread.createdAt}
