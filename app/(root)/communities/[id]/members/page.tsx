@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { fetchCommunityDetails, fetchCommunityMembers } from "@/lib/actions/community.actions";
-
 interface Member {
   id: string;
   name: string;

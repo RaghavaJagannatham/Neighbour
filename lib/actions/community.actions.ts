@@ -70,6 +70,30 @@ export async function fetchCommunityDetails(id: string) {
   }
 }
 
+export async function fetchCommunityMembers(communityId: string) {
+  try {
+    // Establish a connection to the database
+    connectToDB();
+
+    // Fetch only the members of the specified community
+    const communityMembers = await Community.findOne({ id: communityId })
+      .select("members") // Select only the "members" field
+      .populate({
+        path: "members",
+        model: User,
+        select: "name username image _id id", // Fields to include
+      });
+
+    // Return the members
+    return communityMembers?.members || [];
+  } catch (error) {
+    // Log and rethrow the error for debugging or higher-level error handling
+    console.error("Error fetching community members:", error);
+    throw error;
+  }
+}
+
+
 export async function fetchCommunityPosts(id: string) {
   try {
     connectToDB();
