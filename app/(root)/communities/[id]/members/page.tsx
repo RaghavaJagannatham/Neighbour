@@ -107,7 +107,7 @@ function CommunityMembersPage() {
                 {/* Admin Action to remove member */}
                 <Button
                   size="sm"
-                  variant="danger"
+                  variant="default"
                   onClick={() => handleRemoveMember(member.id)}
                   disabled={loading} // Disable button during loading
                 >
