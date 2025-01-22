@@ -6,7 +6,6 @@ import { connectToDB } from "../mongoose";
 
 import User from "../models/user.model";
 import Thread from "../models/thread.model";
-import Incident from "../models/incident.model";
 import Community from "../models/community.model";
 
 export async function fetchPosts(pageNumber = 1, pageSize = 20) {
@@ -86,10 +85,9 @@ export async function createThread({ text, author, communityId, path }: Params
 
     revalidatePath(path);
   } catch (error: any) {
-    throw new Error(`Failed to create thread: ${error.message}`);
+    throw new Error(`Failed to create Post: ${error.message}`);
   }
 }
-
 
 async function fetchAllChildThreads(threadId: string): Promise<any[]> {
   const childThreads = await Thread.find({ parentId: threadId });
@@ -102,7 +100,6 @@ async function fetchAllChildThreads(threadId: string): Promise<any[]> {
 
   return descendantThreads;
 }
-
 
 export async function deleteThread(id: string, path: string): Promise<void> {
   try {
@@ -159,10 +156,6 @@ export async function deleteThread(id: string, path: string): Promise<void> {
     throw new Error(`Failed to delete thread: ${error.message}`);
   }
 }
-
-
-
-
 
 export async function fetchThreadById(threadId: string) {
   connectToDB();

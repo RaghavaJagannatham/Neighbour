@@ -1,56 +1,65 @@
-'use client';
-import React, { useEffect, useState } from "react";
-import CommunityCard from "@/components/cards/CommunityCard"; // Adjust this import if necessary
+import { currentUser } from "@clerk/nextjs";
+import { redirect } from "next/navigation";
+
+import Searchbar from "@/components/shared/Searchbar";
+import Pagination from "@/components/shared/Pagination";
+import CommunityCard from "@/components/cards/CommunityCard";
+
+import { fetchUser } from "@/lib/actions/user.actions";
 import { fetchCommunities } from "@/lib/actions/community.actions";
 
-interface Community {
-  id: string;
-  name: string;
-  username: string;
-  image?: string;
-  bio?: string;
-}
+async function Page({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | undefined };
+}) {
+  const user = await currentUser();
+  if (!user) return null;
 
-const CommunitiesPage: React.FC = () => {
-  const [communities, setCommunities] = useState<Community[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const userInfo = await fetchUser(user.id);
+  if (!userInfo?.onboarded) redirect("/onboarding");
 
-  useEffect(() => {
-    const loadCommunities = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchCommunities({}, "asc", 4); // Fetch hardcoded communities
-        console.log("Fetched communities:", data.communities); // Log communities for debugging
-        setCommunities(data.communities); // Set the state with hardcoded data
-      } catch (err) {
-        console.error("Error fetching communities:", err);
-        setError("Failed to load communities.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadCommunities();
-  }, []);
-
-  if (loading) return <div>Loading communities...</div>;
-  if (error) return <div>{error}</div>;
+  const result = await fetchCommunities({
+    searchString: searchParams.q,
+    pageNumber: searchParams?.page ? +searchParams.page : 1,
+    pageSize: 25,
+  });
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Communities</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {communities.length > 0 ? (
-          communities.map((community) => (
-            <CommunityCard key={community.id} community={community} />
-          ))
-        ) : (
-          <p>No communities found.</p>
-        )}
-      </div>
-    </div>
-  );
-};
+    <>
+      <h1 className='head-text'>Communities</h1>
 
-export default CommunitiesPage;
+      <div className='mt-5'>
+        <Searchbar routeType='communities' />
+      </div>
+
+      <section className='mt-9 flex flex-wrap gap-4'>
+        {result.communities.length === 0 ? (
+          <p className='no-result'>No Result</p>
+        ) : (
+          <>
+            {result.communities.map((community) => (
+              <CommunityCard
+                key={community.id}
+                id={community.id}
+                name={community.name}
+                username={community.username}
+                imgUrl={community.image}
+                bio={community.bio}
+                members={community.members}
+              />
+            ))}
+          </>
+        )}
+      </section>
+
+      <Pagination
+        path='communities'
+        pageNumber={searchParams?.page ? +searchParams.page : 1}
+        isNext={result.isNext}
+      />
+    </>
+  );
+}
+
+export default Page;

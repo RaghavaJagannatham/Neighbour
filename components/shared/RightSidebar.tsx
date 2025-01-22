@@ -26,7 +26,7 @@ async function RightSidebar() {
         <div className='mt-7 flex w-[350px] flex-col gap-9'>
           {suggestedCOmmunities.communities.length > 0 ? (
             <>
-              {suggestedCOmmunities.communities.map((community: any) => (
+              {suggestedCOmmunities.communities.map((community) => (
                 <UserCard
                   key={community.id}
                   id={community.id}
