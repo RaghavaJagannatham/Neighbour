@@ -69,6 +69,10 @@ function ThreadCard({
                 {author.name}
               </h4>
             </Link>
+            <p className="text-sm text-gray-1">
+              {formatDateString(createdAt)}
+            </p>
+            
 
             {/* Display thread title */}
             <h3 className="mt-2 text-xl font-semibold text-light-1">{title}</h3>
